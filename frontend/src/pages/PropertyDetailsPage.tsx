@@ -16,6 +16,8 @@ import { useSEO } from '../hooks/useSEO';
 import StructuredData from '../components/common/StructuredData';
 import { formatPrice } from '../utils/formatPrice';
 import glassPavilion from '../images/The Glass Pavilion.jpg';
+import skylinePenthouse from '../images/Skyline Penthouse.jpg';
+import coastalRetreat from '../images/Coastal Retreat.jpg';
 
 interface PropertyData {
   _id: string;
@@ -34,23 +36,59 @@ interface PropertyData {
   googleMapLink?: string;
 }
 
-// Explicit standalone property for assessment evaluation without backend
-const STANDALONE_ASSESSMENT_PROPERTY: PropertyData = {
-  _id: 'blockchain-assessment-property',
-  title: 'The Glass Pavilion',
-  location: '124 Innovation Way, Silicon Beach, CA',
-  price: 12500000,
-  image: [glassPavilion],
-  beds: 6,
-  baths: 5,
-  sqm: 8200,
-  type: 'Villa',
-  availability: 'For Sale',
-  description:
-    'The Glass Pavilion is an architectural masterpiece designed for decentralized title tokenization and ownership registry on the Polygon blockchain. Features floor-to-ceiling panoramic glass, sustainable solar microgrid, private infinity pool, and immutable deed verification.',
-  amenities: ['Swimming Pool', 'Security', 'Gym', 'Gated Community', 'Garden', 'Smart Home Automation', 'Parking'],
-  phone: '+1 (555) 019-2834',
-  googleMapLink: 'https://maps.google.com/?q=Montecito,California',
+// Explicit standalone properties for assessment evaluation without backend
+const STANDALONE_ASSESSMENT_PROPERTIES: Record<string, PropertyData> = {
+  '1': {
+    _id: 'blockchain-assessment-property',
+    title: 'The Glass Pavilion',
+    location: '124 Innovation Way, Silicon Beach, CA',
+    price: 12500000,
+    image: [glassPavilion],
+    beds: 6,
+    baths: 5,
+    sqm: 8200,
+    type: 'Villa',
+    availability: 'For Sale',
+    description:
+      'The Glass Pavilion is an architectural masterpiece designed for decentralized title tokenization and ownership registry on the Polygon blockchain. Features floor-to-ceiling panoramic glass, sustainable solar microgrid, private infinity pool, and immutable deed verification.',
+    amenities: ['Swimming Pool', 'Security', 'Gym', 'Gated Community', 'Garden', 'Smart Home Automation', 'Parking'],
+    phone: '+1 (555) 019-2834',
+    googleMapLink: 'https://maps.google.com/?q=Montecito,California',
+  },
+  '2': {
+    _id: 'blockchain-assessment-property-2',
+    title: 'Skyline Penthouse',
+    location: '888 Ocean Boulevard, Miami, FL',
+    price: 8750000,
+    image: [skylinePenthouse],
+    beds: 4,
+    baths: 4,
+    sqm: 5400,
+    type: 'Penthouse',
+    availability: 'For Sale',
+    description:
+      'Skyline Penthouse offers breathtaking panoramic ocean and skyline views from the 54th floor. Features private elevator access, wraparound terrace, custom Italian kitchen, and smart contract deed integration on Polygon Amoy.',
+    amenities: ['Private Elevator', 'Rooftop Terrace', 'Concierge', 'Valet Parking', 'Infinity Spa', 'Smart Home Automation'],
+    phone: '+1 (555) 028-4912',
+    googleMapLink: 'https://maps.google.com/?q=Miami,Florida',
+  },
+  '3': {
+    _id: 'blockchain-assessment-property-3',
+    title: 'Coastal Retreat',
+    location: '42 Pelican Point, Malibu, CA',
+    price: 6900000,
+    image: [coastalRetreat],
+    beds: 5,
+    baths: 4,
+    sqm: 4800,
+    type: 'Beach House',
+    availability: 'For Sale',
+    description:
+      'A serene oceanfront sanctuary with direct private beach access. Architecturally sculpted with sustainable teak and glass, featuring outdoor fire lounges, solar battery storage, and verifiable title on Polygon.',
+    amenities: ['Direct Beach Access', 'Fire Pit', 'Solar Microgrid', 'Wine Cellar', 'Heated Pool', 'Security'],
+    phone: '+1 (555) 039-7821',
+    googleMapLink: 'https://maps.google.com/?q=Malibu,California',
+  },
 };
 
 const isEnvStandalone = import.meta.env.VITE_STANDALONE_MODE === 'true';
@@ -71,8 +109,9 @@ const PropertyDetailsPage: React.FC = () => {
       : 'View property details on REChain.',
   });
 
-  const enableStandaloneMode = useCallback(() => {
-    setProperty(STANDALONE_ASSESSMENT_PROPERTY);
+  const enableStandaloneMode = useCallback((targetId?: string) => {
+    const key = targetId && STANDALONE_ASSESSMENT_PROPERTIES[targetId] ? targetId : '1';
+    setProperty(STANDALONE_ASSESSMENT_PROPERTIES[key] || STANDALONE_ASSESSMENT_PROPERTIES['1']);
     setIsStandaloneMode(true);
     setError(null);
     setLoading(false);
@@ -92,7 +131,7 @@ const PropertyDetailsPage: React.FC = () => {
 
     // Configured via .env variable or URL parameter
     if (isEnvStandalone || searchParams.get('standalone') === 'true' || id === 'standalone') {
-      enableStandaloneMode();
+      enableStandaloneMode(id);
       return;
     }
 
@@ -170,7 +209,7 @@ const PropertyDetailsPage: React.FC = () => {
 
           <div className="space-y-3">
             <button
-              onClick={enableStandaloneMode}
+              onClick={() => enableStandaloneMode(id)}
               className="w-full bg-[#D4755B] hover:bg-[#B86851] text-white font-manrope font-bold py-3.5 px-6 rounded-xl transition-all shadow-md hover:shadow-lg cursor-pointer text-sm"
             >
               Opt-In: Load Standalone Property for Blockchain Assessment
@@ -225,13 +264,49 @@ const PropertyDetailsPage: React.FC = () => {
       {/* Explicit Standalone Mode Notification Banner */}
       {isStandaloneMode && (
         <div className="bg-amber-50 border-b border-amber-200 px-6 py-2.5">
-          <div className="max-w-[1280px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs font-manrope text-amber-900">
+          <div className="max-w-[1280px] mx-auto flex flex-col md:flex-row items-center justify-between gap-3 text-xs font-manrope text-amber-900">
             <div className="flex items-center space-x-2">
               <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
               <span>
-                <strong>Standalone Assessment Mode:</strong> Active via {isEnvStandalone ? <code className="bg-amber-100 px-1.5 py-0.5 rounded font-mono font-bold text-amber-950">VITE_STANDALONE_MODE=true (.env)</code> : 'explicit opt-in'}. Displaying test property deed for on-chain Polygon Amoy registration.
+                <strong>Standalone Assessment Mode:</strong> Active via {isEnvStandalone ? <code className="bg-amber-100 px-1.5 py-0.5 rounded font-mono font-bold text-amber-950">VITE_STANDALONE_MODE=true (.env)</code> : 'explicit opt-in'}.
               </span>
             </div>
+
+            {/* Quick Switcher for Testing Multiple On-Chain Registrations */}
+            <div className="flex items-center space-x-2 text-xs">
+              <span className="font-semibold text-amber-800">Test Properties:</span>
+              <Link
+                to="/property/1"
+                className={`px-2.5 py-1 rounded-md transition font-medium ${
+                  id === '1' || !id || id === 'standalone'
+                    ? 'bg-amber-600 text-white font-bold shadow-xs'
+                    : 'bg-amber-100/80 text-amber-900 hover:bg-amber-200'
+                }`}
+              >
+                #1 Glass Pavilion
+              </Link>
+              <Link
+                to="/property/2"
+                className={`px-2.5 py-1 rounded-md transition font-medium ${
+                  id === '2'
+                    ? 'bg-amber-600 text-white font-bold shadow-xs'
+                    : 'bg-amber-100/80 text-amber-900 hover:bg-amber-200'
+                }`}
+              >
+                #2 Skyline Penthouse
+              </Link>
+              <Link
+                to="/property/3"
+                className={`px-2.5 py-1 rounded-md transition font-medium ${
+                  id === '3'
+                    ? 'bg-amber-600 text-white font-bold shadow-xs'
+                    : 'bg-amber-100/80 text-amber-900 hover:bg-amber-200'
+                }`}
+              >
+                #3 Coastal Retreat
+              </Link>
+            </div>
+
             {!isEnvStandalone && (
               <button
                 onClick={disableStandaloneMode}
